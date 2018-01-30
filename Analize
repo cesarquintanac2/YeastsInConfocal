@@ -1,0 +1,17 @@
+input="C:\\Users\\reservasem\\Desktop\\MonitorÃ­a 2017-2\\Levaduras Adriana\\11-12-2017\\AMFSI\\AMFDXT7\\Binarized\\";
+
+files=getFileList(input);
+
+for(i=0; i<18; i++){
+	open(input+files[i]);
+
+	run("Set Measurements...", "area bounding fit shape feret's redirect=None decimal=3");
+	run("Analyze Particles...", "size=0.15-Infinity show=Outlines display");
+
+	selectWindow(files[i]);
+	run("Close");
+
+	selectWindow("Drawing of "+files[i]);
+	saveAs("Tiff", "C:\\Users\\reservasem\\Desktop\\MonitorÃ­a 2017-2\\Levaduras Adriana\\11-12-2017\\AMFSI\\AMFDXT7\\Analized\\"+files[i]);
+	run("Close");
+}
