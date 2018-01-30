@@ -1,0 +1,61 @@
+/*
+ * This Macro Binarizes a previously cropped image according to a dinamic threshold dependant
+ * on the maximum intensity of the image. It was developed for confocal 2D stacks.
+ */
+
+
+/*Set the working directory and save the filenames into a list.*/
+
+input="C:\\Users\\lenovo\\Desktop\\Levaduras Adriana\\MPSI\\MPDXT7\\Croped\\";
+files=getFileList(input);
+
+for(i=0; i<40; i++){
+
+	/*Open the stack .oib from confocal and close the light field image*/
+	open(input+files[i]);
+	run("Split Channels");
+
+	selectWindow("C2-"+files[i]);
+	run("Close");
+
+	/*Make a Gaussian blur and measure the maximum intensity of the image*/
+	selectWindow("C1-"+files[i]);
+	run("Gaussian Blur...", "sigma=2");
+	run("Set Measurements...", "min redirect=None decimal=3");
+	run("Measure");
+	selectWindow("Results");
+	max=getResult("Max",0);
+	threshold=-1;
+
+	/*If the maximum intensity is more than 500, binarize the image with a threshold
+	of half the maximum intensity and despeckle it.*/
+	if(max>=500){
+		threshold=0.5*max;
+	
+		
+	selectWindow("Results");
+	run("Close");
+
+	selectWindow("C1-"+files[i]);
+	setThreshold(0, threshold);
+	run("Convert to Mask");
+	run("Despeckle");
+	run("Invert");
+	
+	}
+	/*If not, set the threshold into -1 and binarize to obtain zeros.*/
+	else{
+		selectWindow("Results");
+	run("Close");
+
+	selectWindow("C1-"+files[i]);
+	setThreshold(0, threshold);
+	run("Convert to Mask");
+	run("Despeckle");
+		
+	}
+
+	/* Save */
+	saveAs("Tiff", "C:\\Users\\lenovo\\Desktop\\LevadurasAdriana\\MPSI\\MPDXT7\\Binarized\\"+files[i]);
+	run("Close");
+}
